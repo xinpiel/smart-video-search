@@ -2,6 +2,7 @@
 
 This application allows users to upload videos, process them for key frames, perform OCR and audio transcription, and search through the content. Users can jump to specific timestamps in the video based on search results.
 
+
 **Features**
 
 Video Upload: Upload multiple video files in formats like MP4, AVI, and MOV.
@@ -18,6 +19,7 @@ Timestamp Navigation: Clickable timestamps allow users to jump to specific point
 
 Database Management: Reset and reprocess videos to update the database.
 
+
 **How It Works**
 
 Upload Videos: Use the file uploader to select and upload video files.
@@ -29,6 +31,7 @@ Search: Enter a search term to find relevant text in the videos.
 View Results: See search results with clickable timestamps to navigate the video.
 
 Reprocess: Use the "Reprocess All Videos" button to reset the database and reprocess all videos.
+
 
 **Technical Details**
 
@@ -50,7 +53,9 @@ Run the Application:
 streamlit run streamlit_app.py
 Access the App: Open your browser and go to http://localhost:8501.
 
+
 **Future Improvements**
+
 Add more improvements to make the code production ready including optimize for GPU and multiple threads processing.
 
 Add more robust error handling and logging.
@@ -62,6 +67,7 @@ Add more robust database backup and restore procedures.
 Enhance search capabilities with more advanced search algorithms or any cloud search functions.
 
 Add support for more video formats and larger file sizes.
+
 
 **Contributing**
 
