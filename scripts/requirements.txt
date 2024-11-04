@@ -1,0 +1,22 @@
+# Core ML
+torch==2.0.1
+torchvision==0.15.2
+transformers==4.37.2
+tiktoken==0.6.0
+accelerate==0.28.0
+
+# Video Processing
+opencv-python==4.8.1.78
+pillow==10.0.0
+
+# OCR
+easyocr==1.7.1
+
+# Web App
+streamlit==1.29.0
+
+# Audio Processing
+openai-whisper==20231117
+
+# Utils
+numpy>=1.24.3
