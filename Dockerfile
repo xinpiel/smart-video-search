@@ -1,40 +1,30 @@
-# Build stage
-FROM python:3.11-slim as builder
-
-WORKDIR /app
-
-# Install build dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy requirements file
-COPY requirements.txt .
-
-# Install dependencies into /app/venv and cleanup
-RUN python -m venv /app/venv && \
-    . /app/venv/bin/activate && \
-    pip install --no-cache-dir -r requirements.txt && \
-    find /app/venv -type d -name "__pycache__" -exec rm -r {} + && \
-    find /app/venv -type d -name "*.dist-info" -exec rm -r {} + && \
-    find /app/venv -type d -name "*.egg-info" -exec rm -r {} +
-
-# Runtime stage
+# Single stage build for faster completion
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy only the necessary files from builder
-COPY --from=builder /app/venv /app/venv
-COPY test_app.py .
+# Install build essentials and create virtual environment in one layer
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/* && \
+    python -m venv /app/venv
+
+# Set virtual environment path
+ENV PATH="/app/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    STREAMLIT_SERVER_PORT=8080 \
+    STREAMLIT_SERVER_ADDRESS=0.0.0.0
+
+# Copy and install requirements
 COPY requirements.txt .
+RUN . /app/venv/bin/activate && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Set environment variables
-ENV PATH="/app/venv/bin:$PATH"
-ENV PYTHONUNBUFFERED=1
+# Copy application file
+COPY test_app.py .
 
-# Make port 8080 available
+# Expose port
 EXPOSE 8080
 
 # Run streamlit
