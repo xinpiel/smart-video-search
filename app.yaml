@@ -3,19 +3,19 @@ instance_class: F2
 
 env_variables:
   GOOGLE_CLOUD_PROJECT: "smart-video-449213"
-  PORT: "8080"
+  STREAMLIT_SERVER_PORT: "8080"
   BUCKET_NAME: "smart-video-449213-temp"
+
+entrypoint: streamlit run streamlit_app.py
 
 handlers:
 - url: /.*
-  script: auto
   secure: always
-
-entrypoint: streamlit run streamlit_app.py --server.port=$PORT --server.address=0.0.0.0 --browser.serverAddress=0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false
+  script: auto
 
 automatic_scaling:
   target_cpu_utilization: 0.65
-  target_throughput_utilization: 0.75
+  min_instances: 1
   max_instances: 5
 
 network:
