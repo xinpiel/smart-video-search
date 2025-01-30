@@ -1,22 +1,37 @@
+# Build stage
+FROM python:3.11-slim as builder
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements file
+COPY requirements.txt .
+
+# Install dependencies into /app/venv
+RUN python -m venv /app/venv && \
+    . /app/venv/bin/activate && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Runtime stage
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    software-properties-common \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy local code to the container image
+# Copy only the necessary files from builder
+COPY --from=builder /app/venv /app/venv
 COPY . .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Set environment variables
+ENV PATH="/app/venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
 
-# Make port 8080 available to the world outside this container
+# Make port 8080 available
 EXPOSE 8080
 
-# Run streamlit when the container launches
-CMD streamlit run test_app.py --server.port=8080 --server.address=0.0.0.0 --server.headless=true --server.runOnSave=false 
+# Run streamlit
+CMD ["streamlit", "run", "test_app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.headless=true", "--server.runOnSave=false"] 
