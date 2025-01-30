@@ -1,5 +1,9 @@
 runtime: python39
-instance_class: F2
+env: flex
+service: default
+
+runtime_config:
+  python_version: 3.9
 
 env_variables:
   GOOGLE_CLOUD_PROJECT: "smart-video-449213"
@@ -33,28 +37,23 @@ handlers:
 
 entrypoint: streamlit run test_app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.runOnSave=false
 
-automatic_scaling:
-  target_cpu_utilization: 0.65
-  min_instances: 1
-  max_instances: 5
-
 network:
   session_affinity: true
   forwarded_ports:
     - 8080
   instance_tag: streamlit
 
-liveness_check:
-  path: "/_stcore/health"
-  check_interval_sec: 30
-  timeout_sec: 4
-  failure_threshold: 2
-  success_threshold: 2
+manual_scaling:
+  instances: 1
+
+resources:
+  cpu: 1
+  memory_gb: 2
+  disk_size_gb: 10
+
+vpc_access_connector:
+  name: projects/smart-video-449213/locations/europe-west4/connectors/connector-1
 
 readiness_check:
-  path: "/_stcore/health"
-  check_interval_sec: 30
-  timeout_sec: 4
-  failure_threshold: 2
-  success_threshold: 2
+  app_start_timeout_sec: 300
 
