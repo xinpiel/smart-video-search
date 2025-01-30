@@ -1,7 +1,10 @@
-runtime: python310 
-entrypoint: streamlit run streamlit_app.py --server.port=$PORT --server.enableCORS=false 
-instance_class: F2 
-automatic_scaling: 
-"  target_cpu_utilization: 0.65" 
-"  target_throughput_utilization: 0.75" 
-"  max_instances: 5" 
+runtime: python310
+entrypoint: streamlit run streamlit_app.py --server.port=$PORT --server.enableCORS=false
+
+instance_class: F2
+
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  target_throughput_utilization: 0.75
+  max_instances: 5
+
