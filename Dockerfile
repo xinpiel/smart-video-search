@@ -12,10 +12,13 @@ RUN apt-get update && \
 # Copy requirements file
 COPY requirements.txt .
 
-# Install dependencies into /app/venv
+# Install dependencies into /app/venv and cleanup
 RUN python -m venv /app/venv && \
     . /app/venv/bin/activate && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements.txt && \
+    find /app/venv -type d -name "__pycache__" -exec rm -r {} + && \
+    find /app/venv -type d -name "*.dist-info" -exec rm -r {} + && \
+    find /app/venv -type d -name "*.egg-info" -exec rm -r {} +
 
 # Runtime stage
 FROM python:3.11-slim
@@ -24,7 +27,8 @@ WORKDIR /app
 
 # Copy only the necessary files from builder
 COPY --from=builder /app/venv /app/venv
-COPY . .
+COPY test_app.py .
+COPY requirements.txt .
 
 # Set environment variables
 ENV PATH="/app/venv/bin:$PATH"
