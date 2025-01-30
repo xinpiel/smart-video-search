@@ -1,9 +1,6 @@
-runtime: python311
+runtime: custom
 env: flex
 service: default
-
-runtime_config:
-  python_version: 3.11
 
 env_variables:
   GOOGLE_CLOUD_PROJECT: "smart-video-449213"
@@ -15,25 +12,6 @@ env_variables:
   STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
   STREAMLIT_SERVER_HEADLESS: "true"
   STREAMLIT_SERVER_RUN_ON_SAVE: "false"
-
-handlers:
-- url: /_stcore/stream.*
-  script: auto
-  secure: always
-
-- url: /_stcore/.*
-  script: auto
-  secure: always
-
-- url: /stream.*
-  script: auto
-  secure: always
-
-- url: /.*
-  script: auto
-  secure: always
-
-entrypoint: streamlit run test_app.py --server.address=0.0.0.0 --server.headless=true --server.runOnSave=false
 
 network:
   session_affinity: true
