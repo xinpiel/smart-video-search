@@ -3,15 +3,21 @@ instance_class: F2
 
 env_variables:
   GOOGLE_CLOUD_PROJECT: "smart-video-449213"
+  PORT: "8080"
+  PYTHONUNBUFFERED: "true"
   STREAMLIT_SERVER_PORT: "8080"
-  BUCKET_NAME: "smart-video-449213-temp"
-
-entrypoint: streamlit run streamlit_app.py
+  STREAMLIT_SERVER_ADDRESS: "0.0.0.0"
+  STREAMLIT_SERVER_BASEURL_PATH: ""
+  STREAMLIT_SERVER_ENABLE_CORS: "false"
+  STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION: "false"
+  STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
 
 handlers:
 - url: /.*
-  secure: always
   script: auto
+  secure: always
+
+entrypoint: streamlit run test_app.py --server.port=$PORT --server.address=0.0.0.0
 
 automatic_scaling:
   target_cpu_utilization: 0.65
@@ -20,4 +26,18 @@ automatic_scaling:
 
 network:
   session_affinity: true
+
+liveness_check:
+  path: "/_stcore/health"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
+
+readiness_check:
+  path: "/_stcore/health"
+  check_interval_sec: 30
+  timeout_sec: 4
+  failure_threshold: 2
+  success_threshold: 2
 

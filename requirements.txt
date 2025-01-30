@@ -20,3 +20,6 @@ openai-whisper==20231117
 
 # Utils
 numpy>=1.24.3
+
+# Added from the code block
+protobuf==3.20.0
