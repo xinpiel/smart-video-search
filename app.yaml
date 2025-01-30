@@ -7,9 +7,7 @@ runtime_config:
 
 env_variables:
   GOOGLE_CLOUD_PROJECT: "smart-video-449213"
-  PORT: "8080"
   PYTHONUNBUFFERED: "true"
-  STREAMLIT_SERVER_PORT: "8080"
   STREAMLIT_SERVER_ADDRESS: "0.0.0.0"
   STREAMLIT_SERVER_BASEURL_PATH: ""
   STREAMLIT_SERVER_ENABLE_CORS: "false"
@@ -35,7 +33,7 @@ handlers:
   script: auto
   secure: always
 
-entrypoint: streamlit run test_app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.runOnSave=false
+entrypoint: streamlit run test_app.py --server.address=0.0.0.0 --server.headless=true --server.runOnSave=false
 
 network:
   session_affinity: true
