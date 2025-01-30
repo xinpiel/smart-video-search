@@ -28,19 +28,18 @@ jobs:
       uses: 'google-github-actions/auth@v1'
       with:
         credentials_json: '${{ secrets.GCP_KEY }}'
+        project_id: 'smart-video-449213'
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
 
     - name: Configure Google Cloud project
       run: |
-        gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+        gcloud config set project smart-video-449213
         gcloud auth configure-docker
 
     - name: Deploy to App Engine
       run: |
         gcloud app deploy app.yaml --quiet
       env:
-        GOOGLE_CLOUD_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+        GOOGLE_CLOUD_PROJECT: smart-video-449213
