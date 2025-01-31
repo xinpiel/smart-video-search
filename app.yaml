@@ -1,23 +1,23 @@
-runtime: custom
+runtime: python311
 env: flex
-service: default
+
+entrypoint: streamlit run test_app.py --server.address=0.0.0.0 --server.headless=true
 
 env_variables:
-  GOOGLE_CLOUD_PROJECT: "smart-video-449213"
   PYTHONUNBUFFERED: "true"
-  STREAMLIT_SERVER_ADDRESS: "0.0.0.0"
-  STREAMLIT_SERVER_BASEURL_PATH: ""
-  STREAMLIT_SERVER_ENABLE_CORS: "false"
-  STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION: "false"
-  STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
-  STREAMLIT_SERVER_HEADLESS: "true"
-  STREAMLIT_SERVER_RUN_ON_SAVE: "false"
 
 network:
   session_affinity: true
   forwarded_ports:
     - 8080
-  instance_tag: streamlit
+
+handlers:
+- url: /.*
+  script: auto
+  secure: always
+  http_headers:
+    Upgrade: $HTTP_UPGRADE
+    Connection: Upgrade
 
 manual_scaling:
   instances: 1
@@ -26,10 +26,4 @@ resources:
   cpu: 1
   memory_gb: 2
   disk_size_gb: 10
-
-vpc_access_connector:
-  name: projects/smart-video-449213/locations/europe-west4/connectors/connector-1
-
-readiness_check:
-  app_start_timeout_sec: 300
 
