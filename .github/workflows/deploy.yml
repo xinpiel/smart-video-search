@@ -1,9 +1,15 @@
-name: Deploy to Google Cloud
+name: Deploy to Cloud Run
 
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main
+
+env:
+  PROJECT_ID: smart-video-449213
+  REGION: europe-west4
+  SERVICE_NAME: smartvideo
+  REPOSITORY: smartvideo
 
 jobs:
   deploy:
@@ -16,59 +22,59 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.11'
         cache: 'pip'
 
-    # Cache pip packages
     - name: Cache pip packages
       uses: actions/cache@v3
       with:
         path: |
           ~/.cache/pip
-          ~/.local/lib/python3.9/site-packages
+          ~/.local/lib/python3.11/site-packages
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
-    # Cache Google Cloud SDK
-    - name: Cache Google Cloud SDK
-      uses: actions/cache@v3
-      with:
-        path: ~/.config/gcloud
-        key: ${{ runner.os }}-gcloud-sdk-${{ hashFiles('**/.gcloudignore') }}
-        restore-keys: |
-          ${{ runner.os }}-gcloud-sdk-
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r scripts/requirements.txt
+        pip install -r requirements.txt
 
     - name: Authenticate to Google Cloud
       uses: 'google-github-actions/auth@v1'
       with:
         credentials_json: '${{ secrets.GCP_KEY }}'
-        project_id: 'smart-video-449213'
+        project_id: ${{ env.PROJECT_ID }}
 
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
 
-    - name: Configure Google Cloud project
+    - name: Create Artifact Registry Repository
       run: |
-        gcloud config set project smart-video-449213
-        gcloud auth configure-docker
+        gcloud artifacts repositories create ${{ env.REPOSITORY }} \
+          --repository-format=docker \
+          --location=${{ env.REGION }} \
+          --description="Docker repository for ${{ env.SERVICE_NAME }}" \
+          || true
 
-    # Cache App Engine deployments
-    - name: Cache App Engine deployments
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/google-cloud-appengine-python
-        key: ${{ runner.os }}-appengine-${{ hashFiles('**/*.py', '**/*.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-appengine-
-
-    - name: Deploy to App Engine
+    - name: Configure Docker
       run: |
-        gcloud app deploy app.yaml --quiet
-      env:
-        GOOGLE_CLOUD_PROJECT: smart-video-449213
+        gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+    - name: Build and Push Container
+      run: |
+        docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+        docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy ${{ env.SERVICE_NAME }} \
+          --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+          --region ${{ env.REGION }} \
+          --platform managed \
+          --allow-unauthenticated \
+          --memory 2Gi \
+          --cpu 1 \
+          --port 8080 \
+          --min-instances 1 \
+          --max-instances 1
