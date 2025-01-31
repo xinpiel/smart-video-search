@@ -1,4 +1,4 @@
-runtime: python311
+runtime: python39
 env: flex
 
 entrypoint: streamlit run test_app.py --server.address=0.0.0.0 --server.headless=true
